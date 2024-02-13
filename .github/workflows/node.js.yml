@@ -11,21 +11,27 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x, 21.x]
+        node-version: [21.x]
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        path: /home/ubuntu/slack
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+
     - name: Restart server and Pull latest changes
       run: |
         cd /home/ubuntu/slack/server
         git pull
         pm2 restart server
-    - name: Restart React app
+
+    - name: Restart React app and Pull latest changes
       run: |
         cd /home/ubuntu/slack/client
         git pull
