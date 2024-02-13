@@ -19,22 +19,32 @@ jobs:
         with:
           path: slack
 
-      - name: Navigate to the server directory and Use Node.js
+      - name: Navigate to the server directory
+        run: cd slack/server
+
+      - name: Use Node.js ${{ matrix.node-version }} for server
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install server dependencies and Restart server
         run: |
-          cd slack/server
-          npm config set cache /home/ubuntu/.npm
           npm ci
-          cd ../client
-          npm config set cache /home/ubuntu/.npm
-          npm ci
-      - name: Restart server and Pull latest changes
-        run: |
-          cd slack/server
           git pull
           pm2 restart server
 
-      - name: Restart React app and Pull latest changes
+      - name: Navigate to the client directory
+        run: cd ../client
+
+      - name: Use Node.js ${{ matrix.node-version }} for client
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install client dependencies and Restart React app
         run: |
-          cd ../client
+          npm ci
           git pull
           pm2 restart my-react-app
