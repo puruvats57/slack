@@ -278,7 +278,7 @@ function Dashboard({ socket }) {
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <h2>Organization Name: {organizationData.name}</h2>
+                <h2>Organization name: {organizationData.name}</h2>
                 <button onClick={CreateGroup}>create group</button>
                 <button onClick={handleLogout}>Logout</button>
             </div>
