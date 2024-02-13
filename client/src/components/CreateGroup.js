@@ -14,7 +14,7 @@ function CreateGroup() {
     useEffect(() => {
         const fetchData = async () => {
             var search;
-            const searchResponse = await fetch(`${process.env.backend_url}:5000/api/v1/organization/searchOrgMembers`, {
+            const searchResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}:5000/api/v1/organization/searchOrgMembers`, {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
@@ -85,7 +85,7 @@ function CreateGroup() {
                 mem,
                 orgId
             };
-            const membersResponse = await fetch(`${process.env.backend_url}:5000/api/v1/organization/CreateGroup`, {
+            const membersResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}:5000/api/v1/organization/CreateGroup`, {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
@@ -117,7 +117,7 @@ function CreateGroup() {
 
         var search = e.target.value;
 
-        const searchResponse = await fetch(`${process.env.backend_url}:5000/api/v1/organization/searchOrgMembers`, {
+        const searchResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}:5000/api/v1/organization/searchOrgMembers`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',

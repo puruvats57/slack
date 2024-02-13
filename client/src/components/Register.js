@@ -10,7 +10,7 @@ function Register() {
 
     const handleRegister = async () => {
         try {
-            const response = await fetch(`${process.env.backend_url}:5000/api/v1/user/register`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}:5000/api/v1/user/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

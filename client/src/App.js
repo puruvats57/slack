@@ -11,7 +11,7 @@ import OrgJoined from './components/OrgJoined';
 import ChatPage from './components/ChatPage';
 import CreateGroup from './components/CreateGroup';
 import GroupChat from './components/GroupChat';
-const socket = io(`${process.env.backend_url}`);
+const socket = io(`${process.env.REACT_APP_BACKEND_URL}:5000`);
 
 function App() {
     return (

@@ -13,7 +13,7 @@ function GroupChat({ socket }) {
 
         console.log("hye useeffect");
         async function fun() {
-            const grpResponse = await fetch(`${process.env.backend_url}:5000/api/v1/organization/getGrpMsgs`, {
+            const grpResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}:5000/api/v1/organization/getGrpMsgs`, {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
@@ -82,7 +82,7 @@ function GroupChat({ socket }) {
 
 
         setMessages((prevMessages) => prevMessages.filter((_, idx) => idx !== index));
-        fetch(`${process.env.backend_url}:5000/api/v1/organization/deleteChatForGrp`, {
+        fetch(`${process.env.REACT_APP_BACKEND_URL}:5000/api/v1/organization/deleteChatForGrp`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',

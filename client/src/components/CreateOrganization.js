@@ -12,7 +12,7 @@ function CreateOrganization() {
     const handleCreateOrganization = () => {
         const token = localStorage.getItem('token');
 
-        fetch(`${process.env.backend_url}:5000/api/v1/organization/createOrganization`, {
+        fetch(`${process.env.REACT_APP_BACKEND_URL}:5000/api/v1/organization/createOrganization`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',

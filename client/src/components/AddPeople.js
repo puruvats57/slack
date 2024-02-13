@@ -10,7 +10,7 @@ function AddPeople() {
       try {
           const orgId = localStorage.getItem('selectedOrgId');
           const token = localStorage.getItem('token');
-      const response = await fetch(`${process.env.backend_url}:5000/api/v1/organization/addPeople`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}:5000/api/v1/organization/addPeople`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
