@@ -25,14 +25,20 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      - name: Restart server and Pull latest changes
+      - name: Navigate to the server directory
+        run: cd slack/server
+
+      - name: Install server dependencies and Restart server
         run: |
-          cd slack/server
+          npm ci
           git pull
           pm2 restart server
 
-      - name: Restart React app and Pull latest changes
+      - name: Navigate to the client directory
+        run: cd ../client
+
+      - name: Install client dependencies and Restart React app
         run: |
-          cd slack/client
+          npm ci
           git pull
           pm2 restart my-react-app
