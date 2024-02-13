@@ -20,9 +20,13 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - name: Restart server
-      run: pm2 restart server
-      working-directory: /home/ubuntu/slack/server
+    - name: Restart server and Pull latest changes
+      run: |
+        cd /home/ubuntu/slack/server
+        git pull
+        pm2 restart server
     - name: Restart React app
-      run: pm2 restart my-react-app
-      working-directory: /home/ubuntu/slack/client
+      run: |
+        cd /home/ubuntu/slack/client
+        git pull
+        pm2 restart my-react-app
