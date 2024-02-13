@@ -13,7 +13,7 @@ function GroupChat({ socket }) {
 
         console.log("hye useeffect");
         async function fun() {
-            const grpResponse = await fetch(`http://localhost:5000/api/v1/organization/getGrpMsgs`, {
+            const grpResponse = await fetch(`${process.env.backend_url}:5000/api/v1/organization/getGrpMsgs`, {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
@@ -72,7 +72,7 @@ function GroupChat({ socket }) {
 
     socket.on('getdeleteForEveryoneInGrp', (newMessage) => {
 
-    
+
         //setMessages((prevMessages) => prevMessages.filter((_, idx) => idx !== newMessage.index));
         setMessages((prevMessages) => prevMessages.filter((m) => m._id != newMessage._id));
 
@@ -82,7 +82,7 @@ function GroupChat({ socket }) {
 
 
         setMessages((prevMessages) => prevMessages.filter((_, idx) => idx !== index));
-        fetch('http://localhost:5000/api/v1/organization/deleteChatForGrp', {
+        fetch(`${process.env.backend_url}:5000/api/v1/organization/deleteChatForGrp`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -104,7 +104,7 @@ function GroupChat({ socket }) {
             });
 
         if (option == 2) {
-            
+
 
             socket.emit('deleteForEveryoneInGrp', { index, msgid, groupId, userId });
         }

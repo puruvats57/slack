@@ -11,7 +11,7 @@ import OrgJoined from './components/OrgJoined';
 import ChatPage from './components/ChatPage';
 import CreateGroup from './components/CreateGroup';
 import GroupChat from './components/GroupChat';
-const socket = io('http://localhost:5000');
+const socket = io(`${process.env.backend_url}`);
 
 function App() {
     return (

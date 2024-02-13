@@ -16,7 +16,7 @@ function ChatPage({ socket }) {
   useEffect(() => {
     socket.emit('join', { userId, memberId, page: 'chat' });
     const token = localStorage.getItem('token');
-    fetch('http://localhost:5000/api/v1/organization/fetchDirectMsgs', {
+    fetch(`${process.env.backend_url}:5000/api/v1/organization/fetchDirectMsgs`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json; charset=UTF-8',
@@ -92,7 +92,7 @@ function ChatPage({ socket }) {
 
     setMessages((prevMessages) => prevMessages.filter((_, idx) => idx !== index));
 
-    fetch('http://localhost:5000/api/v1/organization/deleteChat', {
+    fetch(`${process.env.backend_url}:5000/api/v1/organization/deleteChat`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json; charset=UTF-8',

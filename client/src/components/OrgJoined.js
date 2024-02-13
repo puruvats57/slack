@@ -10,7 +10,7 @@ function OrgJoined() {
         const fetchData = async () => {
             const token = localStorage.getItem('token');
             try {
-                await fetch('http://localhost:5000/api/v1/organization/orgJoined', {
+                await fetch(`${process.env.backend_url}:5000/api/v1/organization/orgJoined`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

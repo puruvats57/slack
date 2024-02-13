@@ -21,7 +21,7 @@ function Dashboard({ socket }) {
         const fetchData = async () => {
             try {
                 // Fetch organization data
-                const orgResponse = await fetch(`http://localhost:5000/api/v1/organization/getOrg`, {
+                const orgResponse = await fetch(`${process.env.backend_url}:5000/api/v1/organization/getOrg`, {
                     method: 'POST',
                     headers: {
                         'Content-type': 'application/json; charset=UTF-8',
@@ -50,7 +50,7 @@ function Dashboard({ socket }) {
                 }
 
                 // Fetch members data
-                const membersResponse = await fetch(`http://localhost:5000/api/v1/organization/getHomeMembersAndGroups`, {
+                const membersResponse = await fetch(`${process.env.backend_url}:5000/api/v1/organization/getHomeMembersAndGroups`, {
                     method: 'POST',
                     headers: {
                         'Content-type': 'application/json; charset=UTF-8',
@@ -76,7 +76,7 @@ function Dashboard({ socket }) {
                 }
 
                 //fetch messages
-                const msgs = await fetch(`http://localhost:5000/api/v1/organization/getDisconnectMsgs`, {
+                const msgs = await fetch(`${process.env.backend_url}:5000/api/v1/organization/getDisconnectMsgs`, {
                     method: 'GET',
                     headers: {
                         'Content-type': 'application/json; charset=UTF-8',
@@ -109,7 +109,7 @@ function Dashboard({ socket }) {
                 }
 
                 //fetch groups
-                const grps = await fetch(`http://localhost:5000/api/v1/organization/getYourGroups`, {
+                const grps = await fetch(`${process.env.backend_url}:5000/api/v1/organization/getYourGroups`, {
                     method: 'POST',
                     headers: {
                         'Content-type': 'application/json; charset=UTF-8',
@@ -241,7 +241,7 @@ function Dashboard({ socket }) {
         setSearchTerm(e.target.value);
         var search = e.target.value;
         if (search) {
-            const searchResponse = await fetch(`http://localhost:5000/api/v1/organization/searchOrgMembers`, {
+            const searchResponse = await fetch(`${process.env.backend_url}:5000/api/v1/organization/searchOrgMembers`, {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
