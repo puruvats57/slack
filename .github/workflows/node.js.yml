@@ -16,25 +16,20 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          path: slack
-
-      - name: Navigate to the server directory and Use Node.js
-        run: |
-          cd slack/server
-          npm config set cache /home/ubuntu/.npm
-          npm ci
-          cd ../client
-          npm config set cache /home/ubuntu/.npm
-          npm ci
-      - name: Restart server and Pull latest changes
-        run: |
-          cd slack/server
-          git pull
-          pm2 restart server
-
-      - name: Restart React app and Pull latest changes
-        run: |
-          cd ../client
-          git pull
-          pm2 restart my-react-app
+      - name: Set up client environment
+        env:
+          CLIENT_SECRET_KEY: ${{ secrets.CLIENT_SECRET_KEY }}
+        run: echo "SECRET_KEY=${CLIENT_SECRET_KEY}" > client/.env
+      - name: Install client dependencies
+        working-directory: client
+        run: npm install
+      - name: Set up server environment
+        env:
+          SERVER_SECRET_KEY: ${{ secrets.SERVER_SECRET_KEY }}
+        run: echo "SECRET_KEY=${SERVER_SECRET_KEY}" > server/.env
+      - name: Install server dependencies
+        working-directory: server
+        run: npm install
+        
+        
+  
