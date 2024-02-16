@@ -99,13 +99,22 @@ async function initializeSocket(server, corsOptions, redis, kafka) {
                 }
             });
         })
-        socket.on('sendMsgInGrps', async (room, message, userId) => {
+        socket.on('sendMsgInGrps', async (room, message, file, userId) => {
             const u = await User.findOne({ _id: userId }).select('fullName');
             const sender = u.fullName;
 
-            const chat = await Message.create({ sender: userId, text: message });
+            var chat;
+            if (message) {
+                chat = await Message.create({ sender: userId, text: message });
+            }
+            else {
+
+                chat = await Message.create({ sender: userId, fileLink: file });
+
+            }
+
             await sendMsgsinGrp(room, userId, message, chat._id);
-            console.log("hye snding");
+
             var data = {};
             const memb = await group.findOne({ _id: room }).select('members');
             const members = memb.members;
@@ -120,7 +129,7 @@ async function initializeSocket(server, corsOptions, redis, kafka) {
 
 
                     // io.to(room).emit('receiveGrpMsgs', { sender: userId, text: message, msgid: chat._id });
-                    socket.to(sId).emit('receiveGrpMsgs', { sender: userId, text: message, _id: chat._id });
+                    socket.to(sId).emit('receiveGrpMsgs', { senderName: sender, sender: userId, text: message, file: file, _id: chat._id });
 
                 }
                 else {
@@ -140,12 +149,12 @@ async function initializeSocket(server, corsOptions, redis, kafka) {
                 }
             }
 
-            socket.emit('receiveGrpMsgs', { sender: userId, text: message, _id: chat._id });
+            socket.emit('receiveGrpMsgs', { senderName: sender, sender: userId, text: message, file: file, _id: chat._id });
 
 
         });
         socket.on('deleteForEveryoneInGrp', async (data) => {
-            
+
             io.to(data.groupId).emit('getdeleteForEveryoneInGrp', { userId: data.userId, _id: data.msgid, groupId: data.groupId });
 
         })
@@ -187,7 +196,7 @@ async function initializeSocket(server, corsOptions, redis, kafka) {
                 // const senderKey = await getRedisKeyBySocketId(socket.id); //sender uid
                 let senderKey = data.userId;
 
-                handleSId(sId, data.message, senderKey, data.memberId, isConnect, page);
+                handleSId(sId, data.message, data.file, senderKey, data.memberId, isConnect, page);
             } catch (err) {
                 console.error(err);
             }
@@ -260,12 +269,23 @@ async function initializeSocket(server, corsOptions, redis, kafka) {
         }
 
 
-        async function handleSId(sId, msg, senderKey, receiverKey, isConnect, page) {
+        async function handleSId(sId, msg, file, senderKey, receiverKey, isConnect, page) {
 
-            const chat = await Message.create({ sender: senderKey, text: msg });
+            var chat;
+            if (msg) {
+                chat = await Message.create({ sender: senderKey, text: msg });
+            }
+            else {
+
+                chat = await Message.create({ sender: senderKey, fileLink: file });
+
+            }
+
+            const name = await User.findOne({ _id: senderKey }).select('fullName');
 
             if (isConnect && page == 'chat') {
-                socket.to(sId).emit('message', { senderId: senderKey, msg, _id: chat._id });
+
+                socket.to(sId).emit('message', { senderName: name.fullName, senderId: senderKey, msg, file, _id: chat._id });
             }
             else if (isConnect && page == 'home') {
                 var data = await storeMessagesForHomePage(receiverKey, senderKey, chat._id);
@@ -290,7 +310,7 @@ async function initializeSocket(server, corsOptions, redis, kafka) {
                 topic: 'directmsgs',
                 messages: [kafkaMessage],
             });
-            socket.emit('message', { senderId: senderKey, msg, msgid: chat._id });
+            socket.emit('message', { senderId: senderKey, msg, file, _id: chat._id });
 
         }
         async function storeMessagesForHomePage(uid, senderId, msgid) {

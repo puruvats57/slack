@@ -10,8 +10,10 @@ const orgSchema = new Schema(
             ref: 'User'
         },
         text: {
-            type: String,
-            required: true
+            type: String
+        },
+        fileLink: {
+            type: String
         },
         dontDisplay: [{
             type: Schema.Types.ObjectId,

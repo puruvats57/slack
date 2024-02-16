@@ -8,6 +8,8 @@ function GroupChat({ socket }) {
     var token = localStorage.getItem('token');
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
+    const [fileUrl, setFileUrl] = useState('');
+    const [file, setFile] = useState(null);
     useEffect(() => {
         socket.emit('joinGroup', userId, groupId);
 
@@ -57,11 +59,41 @@ function GroupChat({ socket }) {
         setMessage(e.target.value);
 
     };
-    const sendMessage = () => {
-        if (message.trim() !== '') {
-            console.log("seding....");
+    const handleFileChange = (e) => {
+        setFile(e.target.files[0]); // Only taking the first selected file
+    };
+    const handleFileUpload = () => {
+        if (file) {
+            const formData = new FormData();
+            formData.append('file', file);
 
-            socket.emit('sendMsgInGrps', groupId, message, userId);
+            // Send file to the server for uploading
+            fetch(`${process.env.REACT_APP_BACKEND_URL}:5000/api/v1/organization/uploadToS3`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+
+                },
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("file successfully uploaded");
+                    const fileUrl = data.data;
+
+                    setFileUrl(fileUrl);
+                })
+                .catch(error => {
+                    console.error('Error uploading file:', error);
+                });
+        }
+    };
+    const sendMessage = () => {
+        if (message.trim() !== '' || fileUrl != '') {
+
+
+            socket.emit('sendMsgInGrps', groupId, message, fileUrl, userId);
+
             setMessage('');
             // setMessage('');
 
@@ -114,9 +146,25 @@ function GroupChat({ socket }) {
         <div>
             <div>
                 {messages.map((msg, index) => (
-                    // <div key={index}>{msg.text}</div>
+
                     <div key={index}>
-                        <p>{msg.msg || msg.text}</p>
+                        {/* <p>{msg.msg || msg.text}</p> */}
+                        {(msg.senderId === userId || msg.sender === userId) ? (
+                            <p>You-</p>
+                        ) : (
+                            <p>sender-{msg.senderName || msg.sender}</p>
+                        )}
+
+                        {(msg.msg || msg.text) ? (
+                            <p>msg-{msg.msg || msg.text}</p>
+                        ) : (
+
+                            <div className="image-container">
+                                <img src={msg.file} />
+                            </div>
+
+
+                        )}
 
 
                         <button onClick={() => deleteMsg(index, msg._id, 1)}>
@@ -131,6 +179,8 @@ function GroupChat({ socket }) {
                     </div>
                 ))}
             </div>
+            <input type="file" onChange={handleFileChange} />
+            <button onClick={handleFileUpload}>send media</button>
             <input type="text" value={message} onChange={handleMessageChange} />
             <button onClick={sendMessage}>Send</button>
         </div>

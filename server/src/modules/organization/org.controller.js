@@ -6,6 +6,9 @@ const Email = require("../../models/email.model.js");
 const Messages = require("../../models/chatMessages.model.js");
 const storeDisconnect = require("../../models/storeDisconnect.model.js");
 const groupCount = require("../../models/groupCount.model.js");
+const { deleteFile } = require("../../utils/s3.js");
+const url = require('url');
+const path = require('path');
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -124,7 +127,7 @@ exports.fetchDirectMsgs = async (req, res) => {
         const data = await Messages.find({
             _id: { $in: msgs },
             dontDisplay: { $ne: userId }
-        });
+        }).populate('sender', 'fullName').exec();
 
 
 
@@ -179,12 +182,18 @@ exports.deleteChat = async (req, res) => {
         // const d1 = await User.findOneAndUpdate({ _id: memberId, 'friends.friendId': userId },
         //     { $pull: { 'friends.$.messages': { _id: msgid } } }, { new: true }
         // )
+        var url = await Messages.findOne({ _id: msgid }).select('fileLink');
+        console.log("url", url.fileLink);
+        var fileUrl = url.fileLink;
+        const fileKey = path.basename(fileUrl);
+        console.log("pathkey", typeof (fileKey));
+        deleteFile(fileKey);
 
         var d = await Messages.deleteOne({ _id: msgid });
 
-        console.log("mmberId", memberId);
+
         const k = await storeDisconnect.findOne({ uid: memberId });
-        console.log("k", k);
+
         if (k) {
 
 
@@ -383,7 +392,7 @@ exports.getYourGroups = async (req, res) => {
         // console.log("data", data);
         res.json({ success: true, data: data, msg: "get group  successfully" });
     }
-    catch(error) {
+    catch (error) {
         res.status(500).json({ success: false, error: error, msg: "Internal Server Error" });
     }
 
@@ -407,6 +416,7 @@ exports.getGrpMsgs = async (req, res) => {
             j.senderId = i.sender._id;
             j.sender = i.sender.fullName;
             j.text = i.text;
+            j.file = i.fileLink;
             data.push(j);
         }
         res.json({ success: true, data: data, msg: "get group msgs successfully" });
@@ -456,12 +466,24 @@ exports.deleteChatForGrp = async (req, res) => {
     }
     else {
         await Group.findOneAndUpdate({ _id: groupId }, { $pull: { messages: msgid } });
+        
+        var url = await Messages.findOne({ _id: msgid }).select('fileLink');
+        var fileUrl = url.fileLink;
+        const fileKey = path.basename(fileUrl);
+        
+        deleteFile(fileKey);
         await Messages.deleteOne({ _id: msgid });
         var d = await groupCount.updateMany({ group: groupId }, { $pull: { messages: msgid } });
         res.json({ data: d });
-        
-    }
 
+    }
+}
+
+exports.uploadToS3 = async (req, res) => {
+
+    const url = req.file.location;
+
+    res.json({ success: true, data: url });
 
 
 }

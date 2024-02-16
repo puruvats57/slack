@@ -1,6 +1,7 @@
 const express = require('express');
 const orgController = require("./org.controller");
 const verifyJWT = require("../../middlewares/auth.middleware.js");
+const { upload } = require("../../utils/s3.js");
 const router = express.Router();
 router.use(verifyJWT);
 
@@ -69,6 +70,11 @@ router.get(
 router.post(
     "/deleteChatForGrp",
     orgController.deleteChatForGrp
+);
+
+router.post(
+    "/uploadToS3", upload.single('file'),
+    orgController.uploadToS3
 );
 
 module.exports = router;

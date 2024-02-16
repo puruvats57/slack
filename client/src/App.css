@@ -1,0 +1,10 @@
+.image-container {
+    max-width: 200px; /* Set maximum width */
+    max-height: 100px; /* Set maximum height */
+    overflow: hidden;
+}
+
+.image-container img {
+    width: 100%; /* Ensure the image takes the full width of its container */
+    height: auto; /* Maintain aspect ratio */
+}

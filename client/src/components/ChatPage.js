@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import '../App.css';
 // import io from 'socket.io-client';
 
 // const socket = io('http://localhost:5000'); 
@@ -10,6 +11,8 @@ function ChatPage({ socket }) {
   const userId = location.state?.userId || null;
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
+  const [fileUrl, setFileUrl] = useState('');
+  const [file, setFile] = useState(null);
 
 
   var token = localStorage.getItem('token');
@@ -52,15 +55,15 @@ function ChatPage({ socket }) {
       //setMessages([newMessage]);
       setMessages((prevMessages) => [...prevMessages, newMessage]);
 
-      console.log("messages", messages);
+      // console.log("messages", messages);
 
 
     });
-    
-    
+
+
     return () => {
       socket.off('message');
-      
+
     };
 
   }, []);
@@ -70,22 +73,53 @@ function ChatPage({ socket }) {
 
     //setMessages((prevMessages) => prevMessages.filter((_, idx) => idx !== newMessage.index));
     setMessages((prevMessages) => prevMessages.filter((m) => m._id != newMessage._id));
-    
+
   });
 
   const handleMessageChange = (e) => {
     setMessage(e.target.value);
   };
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]); // Only taking the first selected file
+  };
+  const handleFileUpload = () => {
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // Send file to the server for uploading
+      fetch(`${process.env.REACT_APP_BACKEND_URL}:5000/api/v1/organization/uploadToS3`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+
+        },
+        body: formData
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log("file successfully uploaded");
+          const fileUrl = data.data;
+
+          setFileUrl(fileUrl);
+        })
+        .catch(error => {
+          console.error('Error uploading file:', error);
+        });
+    }
+  };
 
   const sendMessage = () => {
-    if (message.trim() !== '') {
+    if (message.trim() !== '' || fileUrl != '') {
 
-      socket.emit('sendMessage', { message, memberId, userId });
+
+      socket.emit('sendMessage', { message: message, file: fileUrl, memberId, userId });
       // setMessage('');
 
       // setMessages((prevMessages) => [...prevMessages, { msg: message }]);
 
     }
+
   };
   const deleteMsg = (index, msgid, option) => {
 
@@ -134,17 +168,33 @@ function ChatPage({ socket }) {
 
         {messages.map((msg, index) => (
           <div key={index}>
-            <p>{msg.msg || msg.text}</p>
-            {/* <p>{msg.msgid || msg._id}</p> */}
 
-            <button onClick={() => deleteMsg(index, msg._id, 1)}>
+            {(msg.senderId === userId || msg.sender?._id === userId) ? (
+              <p>You-</p>
+            ) : (
+              <p>sender-{msg.senderName || msg.sender.fullName}</p>
+            )}
+            {/* <p>msg-{msg.msg || msg.text}</p> */}
+            {(msg.msg || msg.text) ? (
+              <p>msg-{msg.msg || msg.text}</p>
+            ) : (
+
+              <div className="image-container">
+                <img src={msg.fileLink || msg.file} />
+              </div>
+
+
+            )}
+
+
+            <button onClick={() => deleteMsg(index, msg?._id, 1)}>
               Delete for me
             </button>
             {/* <button onClick={() => deleteMsg(index, msg.msgid || msg._id, 2)}>
               Delete for everyone
             </button> */}
-            {(msg.senderId === userId || msg.sender === userId) && (
-              <button onClick={() => deleteMsg(index, msg._id, 2)}>
+            {(msg.senderId === userId || msg.sender?._id === userId) && (
+              <button onClick={() => deleteMsg(index, msg?._id, 2)}>
                 Delete for everyone
               </button>
             )}
@@ -152,9 +202,11 @@ function ChatPage({ socket }) {
         ))}
       </div>
 
-
+      <input type="file" onChange={handleFileChange} />
+      <button onClick={handleFileUpload}>send media</button>
       <input type="text" value={message} onChange={handleMessageChange} />
       <button onClick={sendMessage}>Send</button>
+
     </div>
   );
 }
