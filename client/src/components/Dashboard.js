@@ -20,7 +20,7 @@ function Dashboard({ socket }) {
 
         const fetchData = async () => {
             try {
-                // Fetch organization data
+                // Fetch organizations
                 const orgResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}:5000/api/v1/organization/getOrg`, {
                     method: 'POST',
                     headers: {
