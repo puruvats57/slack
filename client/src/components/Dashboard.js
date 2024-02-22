@@ -40,6 +40,7 @@ function Dashboard({ socket }) {
                 const orgData = await orgResponse.json();
 
                 if (orgData.success) {
+                    
                     setOrganizationData(orgData.data);
                     setUserId(orgData.uid);
                     let memberId = orgData.uid;

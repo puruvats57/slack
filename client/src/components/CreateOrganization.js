@@ -32,6 +32,7 @@ function CreateOrganization() {
                 if (data.success) {
                     // Handle successful response
                     console.log('Organization created successfully:', data.data);
+                    localStorage.setItem('selectedOrgId', data.data._id);
                     navigate('/');
                     // You can redirect or perform any other actions after successful creation
                 } else {
