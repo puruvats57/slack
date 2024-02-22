@@ -121,26 +121,39 @@ exports.fetchDirectMsgs = async (req, res) => {
     try {
         const { memberId, userId } = req.body;
         const user = await User.findById(userId);
-        let friend = user.friends.find(friend => friend.friendId.toString() === memberId);
-        var msgs = friend.messages;
+
+        if (!user) {
+            return res.status(404).json({ success: false, msg: "User not found" });
+        }
+
+        if (!user.friends || !Array.isArray(user.friends)) {
+            return res.status(400).json({ success: false, msg: "User's friends list is invalid" });
+        }
+
+        const friend = user.friends.find(friend => friend.friendId.toString() === memberId);
+
+        if (!friend) {
+            return res.status(404).json({ success: false, msg: "Friend not found" });
+        }
+
+        if (!friend.messages || !Array.isArray(friend.messages)) {
+            return res.status(400).json({ success: false, msg: "Friend's messages list is invalid" });
+        }
+
+        const msgs = friend.messages;
 
         const data = await Messages.find({
             _id: { $in: msgs },
             dontDisplay: { $ne: userId }
         }).populate('sender', 'fullName').exec();
 
-
-
-        //console.log("data", data);
-
-        res.json({ success: true, data: data, msg: "get messages successfully" });
-
-    }
-    catch (error) {
+        res.json({ success: true, data: data, msg: "Get messages successfully" });
+    } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, msg: "Internal Server Error" });
     }
 }
+
 
 
 exports.deleteChat = async (req, res) => {
