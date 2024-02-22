@@ -29,7 +29,7 @@ const server = http.createServer(app);
 // Middleware
 const corsOptions = {
     origin: '*',
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
     credentials: true,
 };
 
